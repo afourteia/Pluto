@@ -1,0 +1,8 @@
+GET http://localhost:5275
+
+
+###
+GET http://localhost:5275/Home
+
+###
+GET http://localhost:5275/Home/About?param={"a":"abra","c":2}
