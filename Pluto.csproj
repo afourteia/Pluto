@@ -7,7 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Pluto.Web\Services\" />
+    <Folder Include="References\" />
+    <Reference Include="NITGEN.SDK.NBioBSP">
+      <HintPath>References\NITGEN.SDK.NBioBSP.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>
