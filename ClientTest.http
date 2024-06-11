@@ -14,4 +14,7 @@ GET http://localhost:5275/FingerPrintDevice
 GET http://localhost:5275/FingerPrintDevice/initialize
 
 ###
+GET http://localhost:5275/FingerPrintDevice/longRunningTask
+
+###
 GET http://localhost:5275/FingerPrintDevice/closeDevice/json
