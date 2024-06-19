@@ -8,6 +8,17 @@ namespace Pluto;
 [Route("[controller]")]
 public class FingerPrintDeviceController : ControllerBase
 {
+
+    private readonly ILogger<FingerPrintDeviceController> _logger;
+    private readonly NitgenService _nitgenService;
+
+    public FingerPrintDeviceController(NitgenService nitgenService, ILogger<FingerPrintDeviceController> logger)
+    {
+        _nitgenService = nitgenService;
+        _logger = logger;
+        _logger.LogInformation("FingerPrintDeviceController is being initialized.");
+    }
+
     [HttpGet]
     public IActionResult Index()
     {
@@ -15,31 +26,50 @@ public class FingerPrintDeviceController : ControllerBase
 
     }
 
-    [HttpGet("initialize")]
-    public IActionResult Initialize()
+    [HttpGet("openDevice")]
+    public IActionResult OpenDevice()
     {
-        return Ok("Device Initialized");
-        // m_NBioAPI = new NBioAPI();
-
-        // Get DeviceID
-        // EnumerateDevice function can be used to retrieve the device ID
-
-        // ret = m_NBioAPI.OpenDevice(DeviceID);
-        // if (ret == NBioAPI.Error.NONE)
-        //     return Ok("Device Opened");
-        // else
-        //     return Ok("Device Open Failed");
+        var ret = _nitgenService.OpenDevice();
+        if (ret)
+            return Ok("Device Opened");
+        else
+            return Ok("Device Could not be opened");
     }
 
-    [HttpGet("closeDevice/{deviceId}")]
-    public IActionResult CloseDevice(string deviceId)
+    [HttpGet("deviceCount")]
+    public IActionResult GetDevices()
     {
-        return Ok($"Device Closed: {deviceId}");
-        // ret = m_NBioAPI.CloseDevice(DeviceID);
-        // if (ret == NBioAPI.Error.NONE)
-        //     return Ok("Device Closed");
-        // else
-        //     return Ok("Device Close Failed");
+        var ret = _nitgenService.GetDevices();
+        return Ok($"Number of Devices: {ret}");
+    }
+
+    [HttpGet("deviceNames")]
+    public IActionResult GetDeviceNames()
+    {
+        _nitgenService.GetDevices();
+        return Ok(_nitgenService.DeviceIDs);
+    }
+
+
+    [HttpGet("getVersion")]
+    public IActionResult GetVersion()
+    {
+        var ret = _nitgenService.GetVersion();
+        return Ok($"Software Version: {ret}");
+    }
+
+    [HttpGet("capture")]
+    public IActionResult Capture()
+    {
+        var ret = _nitgenService.Capture();
+        return Ok($"Capturing fingerprint: {ret}");
+    }
+
+    [HttpGet("closeDevice")]
+    public IActionResult CloseDevice()
+    {
+        var ret = _nitgenService.CloseDevice();
+        return Ok($"Device Closed: {ret}");
     }
 
     [HttpGet("enroll")]
