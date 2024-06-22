@@ -8,9 +8,30 @@
 
   <ItemGroup>
     <Folder Include="References\" />
-    <Reference Include="NITGEN.SDK.NBioBSP">
-      <HintPath>References\NITGEN.SDK.NBioBSP.dll</HintPath>
+
+    <Reference Include="NITGEN.SDK.NBioBSP">    
+    <HintPath>C:\Program Files\SecuGen\Drivers\WBFc</HintPath>
+      <!-- <HintPath>References\NITGEN.SDK.NBioBSP.dll</HintPath> -->
     </Reference>
+
+    <Reference Include="sgfplib"> 
+      <HintPath>References\sgfplib.dll</HintPath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Reference>
+    
+    <Reference Include="SecuGen.FDxSDKPro.DotNet.Windows"> 
+      <HintPath>References\SecuGen.FDxSDKPro.DotNet.Windows.dll</HintPath>
+    </Reference>
+
+    <Reference Include="sgfpamx"> 
+    <HintPath>References\sgfpamx.dll</HintPath>
+    </Reference>
+
+
+    <Reference Include="sgwsqlib"> 
+      <HintPath>References\sgwsqlib.dll</HintPath>
+    </Reference>
+    
   </ItemGroup>
 
 </Project>
