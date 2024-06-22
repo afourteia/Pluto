@@ -124,9 +124,10 @@ public class NitgenService
         //     null);
 
         NBioAPI.Type.HFIR SubscriberFIR;
-        NBioAPI.Type.HFIR? InputFIR = new NBioAPI.Type.HFIR();
+        NBioAPI.Type.HFIR InputFIR = null;
         NBioAPI.Type.HFIR? AuditFIR = new NBioAPI.Type.HFIR();
         NBioAPI.Type.WINDOW_OPTION winop = new NBioAPI.Type.WINDOW_OPTION();
+        winop.WindowStyle = NBioAPI.Type.WINDOW_STYLE.POPUP;
         uint ret = 111;
 
         try
@@ -149,7 +150,17 @@ public class NitgenService
 
             hAuditFIR = new NBioAPI.Type.HFIR();
 
-            m_NBioAPI.Enroll(null, out hFIR, null, NBioAPI.Type.TIMEOUT.DEFAULT, hAuditFIR, null);
+
+            NBioAPI.IndexSearch m_IndexSearch = new NBioAPI.IndexSearch(m_NBioAPI);
+            ret = m_IndexSearch.InitEngine();
+            if (ret != NBioAPI.Error.NONE)
+            {
+                _logger.LogInformation($"Initialize Engine Failed: {ret}");
+                return "Initialize Engine Failed";
+            }
+
+            // m_NBioAPI.Enroll(ref InputFIR, out hFIR, null, NBioAPI.Type.TIMEOUT.DEFAULT, hAuditFIR, null);
+            ret = m_NBioAPI.Enroll(ref InputFIR, out SubscriberFIR, null, 20000, null, winop);
             _logger.LogInformation($"Enroll Capture ret: ");
         }
         catch (Exception ex)
@@ -258,6 +269,6 @@ public class NitgenService
 
     ~NitgenService()
     {
-        _logger.LogInformation("NitgenService is being finalized.");
+        _logger.LogInformation("NitgenService is destroyed.");
     }
 }
