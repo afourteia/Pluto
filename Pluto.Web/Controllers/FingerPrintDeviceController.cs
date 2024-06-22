@@ -10,11 +10,15 @@ public class FingerPrintDeviceController : ControllerBase
 {
 
     private readonly ILogger<FingerPrintDeviceController> _logger;
-    private readonly NitgenService _nitgenService;
+    // private readonly NitgenService _nitgenService;
+    private readonly SecuGenService _nitgenService;
 
-    public FingerPrintDeviceController(NitgenService nitgenService, ILogger<FingerPrintDeviceController> logger)
+    public FingerPrintDeviceController(
+        NitgenService nitgenService,
+        SecuGenService secuGenService,
+        ILogger<FingerPrintDeviceController> logger)
     {
-        _nitgenService = nitgenService;
+        _nitgenService = secuGenService;
         _logger = logger;
         _logger.LogInformation("FingerPrintDeviceController is being initialized.");
     }
@@ -24,6 +28,16 @@ public class FingerPrintDeviceController : ControllerBase
     {
         return Ok("Welcome to the FingerPrintDevice page!");
 
+    }
+
+    [HttpGet("getDeviceInfo")]
+    public IActionResult GetDeviceInfo()
+    {
+        var ret = _nitgenService.GetDeviceInfo();
+        if (ret)
+            return Ok("Device Opened");
+        else
+            return Ok("Device Could not be opened");
     }
 
     [HttpGet("openDevice")]
@@ -59,10 +73,20 @@ public class FingerPrintDeviceController : ControllerBase
     }
 
     [HttpGet("capture")]
-    public IActionResult Capture()
+    [RequestTimeout(milliseconds: 5 * 60 * 1000)]
+    public async Task<IActionResult> Capture(CancellationToken cancellationToken)
     {
-        var ret = _nitgenService.Capture();
-        return Ok($"Capturing fingerprint: {ret}");
+        Task<string> task = Task.Run(() => _nitgenService.Capture(), cancellationToken);
+        try
+        {
+            // await Task.Delay(8 * 60 * 1000, cancellationToken); // Wait for 5 seconds
+            string ret = await task;
+            return Ok($"Capturing fingerprint: {ret}");
+        }
+        catch (OperationCanceledException)
+        {
+            return StatusCode(408, "Your custom error message here");
+        }
     }
 
     [HttpGet("closeDevice")]
@@ -70,6 +94,27 @@ public class FingerPrintDeviceController : ControllerBase
     {
         var ret = _nitgenService.CloseDevice();
         return Ok($"Device Closed: {ret}");
+    }
+
+    [HttpGet("brightness/{brightnessLevel}")]
+    public IActionResult SetBrightness(int brightnessLevel)
+    {
+        var ret = _nitgenService.SetBrightness(brightnessLevel);
+        return Ok($"Brightness Set to {brightnessLevel}: {ret}");
+    }
+
+    [HttpGet("configure")]
+    public IActionResult Configure()
+    {
+        var ret = _nitgenService.Configure();
+        return Ok($"Configuration: {ret}");
+    }
+
+    [HttpGet("enableAutoOnEvent")]
+    public IActionResult EnableAutoOnEvent()
+    {
+        var ret = _nitgenService.EnableAutoOnEvent();
+        return Ok($"AutoOnEvent Enabled: {ret}");
     }
 
     [HttpGet("enroll")]

@@ -11,6 +11,9 @@ GET http://localhost:5275/Home/About?param={"a":"abra","c":2}
 GET http://localhost:5275/FingerPrintDevice
 
 ###
+GET http://localhost:5275/FingerPrintDevice/getDeviceInfo
+
+###
 GET http://localhost:5275/FingerPrintDevice/openDevice
 
 ###
@@ -21,6 +24,15 @@ GET http://localhost:5275/FingerPrintDevice/deviceCount
 
 ###
 GET http://localhost:5275/FingerPrintDevice/deviceNames
+
+###
+GET http://localhost:5275/FingerPrintDevice/brightness/70
+
+###
+GET http://localhost:5275/FingerPrintDevice/configure
+
+###
+GET http://localhost:5275/FingerPrintDevice/enableAutoOnEvent
 
 ###
 GET http://localhost:5275/FingerPrintDevice/capture
@@ -37,3 +49,9 @@ GET http://localhost:5275/FingerPrintDevice/longRunningTask
 
 ###
 GET http://localhost:5275/FingerPrintDevice/closeDevice/json
+
+###
+GET http://localhost:5000/apiservice/capture-hash/
+
+###
+GET http://localhost:5000/apiservice/identification/
