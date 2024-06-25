@@ -38,6 +38,12 @@ GET http://localhost:5275/FingerPrintDevice/enableAutoOnEvent
 GET http://localhost:5275/FingerPrintDevice/capture
 
 ###
+GET http://localhost:5275/FingerPrintDevice/enroll
+
+###
+GET http://localhost:5275/FingerPrintDevice/detectFingerOff
+
+###
 GET http://localhost:5275/FingerPrintDevice/convert
 
 ###
