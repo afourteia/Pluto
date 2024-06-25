@@ -8,11 +8,20 @@ public class SecuGenService
     public uint NumDevice { get; set; }
     public short[]? DeviceIDs { get; set; }
 
-    public SecuGenService(ILogger<NitgenService> logger)
+    public int ImageWidth { get; private set; }
+    public int ImageHeight { get; private set; }
+
+    public int _timeout { get; set; }
+
+    public byte[][] FPImage { get; private set; }
+
+    public SecuGenService(ILogger<NitgenService> logger, int timeout = 10000)
     {
         m_FPM = new SGFingerPrintManager();
         m_FPM.Init(SGFPMDeviceName.DEV_FDU03);
+        _timeout = timeout;
         _logger = logger;
+        FPImage = new byte[2][];
         _logger.LogInformation("SecuGenService is being initialized.");
     }
 
@@ -53,6 +62,12 @@ public class SecuGenService
             _logger.LogInformation("FW Version: {0}", pInfo.FWVersion);
             _logger.LogInformation("Device ID: {0}", pInfo.DeviceID);
             _logger.LogInformation("ComPort: {0}", pInfo.ComPort);
+
+            ImageWidth = pInfo.ImageWidth;
+            ImageHeight = pInfo.ImageHeight;
+            FPImage[0] = new byte[ImageWidth * ImageHeight];
+            FPImage[1] = new byte[ImageWidth * ImageHeight];
+
         }
         return true;
     }
@@ -71,7 +86,10 @@ public class SecuGenService
         var ret = m_FPM.OpenDevice(0x255); // TODO: look for SGFPMPortAddr.USB_AUTO_DETECT
         _logger.LogInformation("Device opening ret: {0}", ret);
         if (ret == (Int32)SGFPMError.ERROR_NONE)
+        {
+            GetDeviceInfo();
             return true;
+        }
         else
             return false;
     }
@@ -95,15 +113,33 @@ public class SecuGenService
         return 1;
     }
 
-    public string Capture()
+    public string Capture(uint i)
     {
-        Byte[] fp_image = new Byte[300 * 260];
-        int iError;
+        if (i != 0 && i != 1)
+            return "Error: Parameter must be 0 or 1.";
         int img_qlty = 0;
-        iError = m_FPM.GetImage(fp_image);
+        int iError = m_FPM.GetImage(FPImage[i]);
         if (iError == (Int32)SGFPMError.ERROR_NONE)
         {
-            m_FPM.GetImageQuality(260, 300, fp_image, ref img_qlty);
+            m_FPM.GetImageQuality(ImageWidth, ImageHeight, FPImage[i], ref img_qlty);
+            return "quality is: " + img_qlty.ToString();
+        }
+        else
+
+            return "Error: " + iError;
+
+    }
+
+    public string CaptureEx(uint i)
+    {
+        if (i != 0 && i != 1)
+            return "Error: Parameter must be 0 or 1.";
+        int img_qlty = 0;
+        int iError = m_FPM.GetImageEx(FPImage[0], _timeout, 0, img_qlty);
+
+        if (iError == (Int32)SGFPMError.ERROR_NONE)
+        {
+            m_FPM.GetImageQuality(ImageWidth, ImageHeight, FPImage[i], ref img_qlty);
             return "quality is: " + img_qlty.ToString();
         }
         else
@@ -123,24 +159,17 @@ public class SecuGenService
 
     public bool Configure()
     {
-        HandleEventDelegate eventDelegate = this.HandleEvent;
-        int iError = m_FPM.Configure((long)eventDelegate);
+        int iError = m_FPM.Configure(0);
         if (iError == (Int32)SGFPMError.ERROR_NONE)
             return true;
         else
             return false;
     }
 
-    public delegate long HandleEventDelegate(long e);
-    private long HandleEvent(long e)
-    {
-        _logger.LogInformation("Event handled.");
-        return 1;
-    }
-
     public bool EnableAutoOnEvent()
     {
-        int iError = m_FPM.EnableAutoOnEvent(true, (long)this.HandleEvent);
+
+        int iError = m_FPM.EnableAutoOnEvent(true, 0);
         return true;
     }
     public uint Process() { return 0; }
@@ -148,9 +177,28 @@ public class SecuGenService
 
     public uint VerifyMatch() { return 0; }
 
-    public uint Enroll()
+    public string DetectFingerOff()
     {
-        return 1;
+        byte[] fp_image = new byte[ImageWidth * ImageHeight];
+        int iError;
+        int img_qlty = 0;
+        iError = m_FPM.GetImage(fp_image);
+        while (iError == (int)SGFPMError.ERROR_NONE)
+        {
+            iError = m_FPM.GetImage(fp_image);
+        }
+
+        if (iError == (int)SGFPMError.ERROR_WRONG_IMAGE)
+        {
+            return "No Finger Detected";
+        }
+
+        return "Error: " + iError;
+    }
+
+    public string Enroll()
+    {
+        return "not supported";
     }
 
     public uint Verify()
