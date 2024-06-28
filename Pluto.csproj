@@ -9,8 +9,10 @@
   <ItemGroup>
     <Folder Include="References\" />
 
-    <Reference Include="NITGEN.SDK.NBioBSP">    
+    <Reference Include="NITGEN.SDK.NBioBSP, Version=5.0.0.0, Culture=neutral, PublicKeyToken=96eee45103d523d1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Program Files (x86)\NITGEN\eNBSP SDK Professional\SDK\dotNET\NITGEN.SDK.NBioBSP.dll</HintPath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Reference>
 
     <Reference Include="sgfplib"> 
@@ -32,5 +34,7 @@
     </Reference>
     
   </ItemGroup>
-
+  <ItemGroup>
+      <Content Include="NITGEN.SDK.NBioBSP.dll" />
+    </ItemGroup>
 </Project>
